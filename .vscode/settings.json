@@ -1,0 +1,19 @@
+{
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.fixAll": [
+        "source.unusedImports"
+    ],
+    "python.envFile": "${workspaceFolder}/.venv",
+    "python.terminal.activateEnvironment": true,
+    "python.analysis.autoSearchPaths": false,
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}/.venv",
+        "${workspaceFolder}/.venv/Lib/site-packages"
+    ],
+    "python.testing.pytestArgs": [
+        "src"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "editor.defaultFormatter": "ms-python.vscode-pylance"
+}

@@ -1,0 +1,25 @@
+# 需要哪些文件就添加哪些那文件，而不是一股脑过滤掉某种不需要的文件，看似简洁，实则懒惰。
+# 添加需要提交的文件，繁琐但准确，在准确面前，所谓的繁琐是值得的
+*
+
+# vscode相关的，多人协作时，个人IDE相关的内容不应该添加到代码仓库
+!*.code-workspace
+!.vscode/
+!.vscode/*.json
+
+# 文档
+!*.md
+
+# git
+!.gitignore
+
+# python
+!requirements.txt
+!src
+!src/**/*.py
+!tests
+!tests/**/*.py
+
+# UI资源文件
+!resources
+!resources/**

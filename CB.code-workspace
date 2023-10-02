@@ -1,0 +1,21 @@
+{
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "settings": {
+        "files.exclude": {
+            "out": false, // set this to true to hide the "out" folder
+            "dist": false,
+            "floating_ball": true
+        },
+        "search.exclude": {
+            "out": true, // set this to false to include "out" folder in search results
+            "dist": true
+        },
+        "files.associations": {
+            ".env*": "properties"
+        }
+    }
+}
