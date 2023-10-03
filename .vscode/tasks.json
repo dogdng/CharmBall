@@ -18,6 +18,24 @@
             },
         },
         {
+            "label": "检查当前文件",
+            "type": "process",
+            "command": "${workspaceFolder}/.venv/Scripts/pyflakes.exe",
+            "args": [
+                "${file}"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/src",
+                "env": {
+                    "PYTHONIOENCODING": "UTF-8",
+                }
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+        },
+        {
             "label": "run",
             "type": "shell",
             "command": "python",
@@ -33,15 +51,7 @@
             },
             "group": {
                 "kind": "build",
-                "isDefault": true
-            },
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": true,
-                "clear": false
+                "isDefault": false
             },
             "problemMatcher": []
         },

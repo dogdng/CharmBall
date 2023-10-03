@@ -15,5 +15,9 @@
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
-    "editor.defaultFormatter": "ms-python.vscode-pylance"
+    "editor.defaultFormatter": "ms-python.vscode-pylance",
+    "python.analysis.typeCheckingMode": "basic",
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.python"
+    }
 }

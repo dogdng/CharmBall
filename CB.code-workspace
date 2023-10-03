@@ -15,7 +15,9 @@
             "dist": true
         },
         "files.associations": {
-            ".env*": "properties"
+            ".env*": "properties",
+            "*.py": "python",
+            "*.json": "json"
         }
     }
 }

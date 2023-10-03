@@ -1,10 +1,26 @@
 # -*- coding: utf-8 -*-
 
-import os, PySide6
-import sys, threading, time
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
+import os, sys, threading, time
+from PySide6 import QtCore, QtGui, QtWidgets
+
+
+def limit_window_in_bounds(parent: QtWidgets.QApplication, pos: QtCore.QPoint, size: QtCore.QSize) -> QtCore.QPoint:
+    # 获取焦点屏幕
+    focus_screen = get_focus_screen(parent)
+
+    # 对新位置进行范围限制,如果拖动到另一块屏幕，则会改变焦点屏幕从而直接跳到另一屏幕，所以不需要进行上下左右有无屏幕的判断了
+    max_x = focus_screen.geometry().right() - size.width()
+    max_y = focus_screen.geometry().bottom() - size.height()
+    if pos.x() < focus_screen.geometry().left():
+        pos.setX(focus_screen.geometry().left())
+    elif pos.x() > max_x:
+        pos.setX(max_x)
+
+    if pos.y() < focus_screen.geometry().top():
+        pos.setY(focus_screen.geometry().top())
+    elif pos.y() > max_y:
+        pos.setY(max_y)
+    return pos
 
 
 # 渐变透明度
@@ -43,7 +59,7 @@ def get_focus_screen(app):
         )
         scale_factor = get_devicePixelRatio(screen)
         # scale_factor = screen.devicePixelRatio()
-        cursor_pos = QCursor.pos()
+        cursor_pos = QtGui.QCursor.pos()
         # 判断鼠标在不在该屏幕内
         if x <= cursor_pos.x() < x + width * scale_factor and y <= cursor_pos.y() < y + height * scale_factor:
             break
