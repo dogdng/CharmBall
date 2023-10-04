@@ -3,10 +3,6 @@
 .\.venv\Scripts\Activate.ps1
 ```
 
-生成requirements.txt
-```
-pip3 freeze > requirements.txt
-```
 
 https://blog.csdn.net/weixin_44446598/article/details/115031335
 
@@ -19,3 +15,4 @@ https://blog.csdn.net/weixin_44446598/article/details/115031335
   - 左键长时间单击，同单击按钮，不会自动变回悬浮球。
   - 双击: 自动贴边
   - 右键
+ 3. 所有的功能以插件的方式动态加载

@@ -36,6 +36,26 @@
             },
         },
         {
+            "label": "更新requirements.txt",
+            "type": "shell",
+            "command": "pip3",
+            "args": [
+                "freeze",
+                ">",
+                "requirements.txt"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}",
+                "env": {
+                    "PYTHONIOENCODING": "UTF-8",
+                }
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+        },
+        {
             "label": "run",
             "type": "shell",
             "command": "python",

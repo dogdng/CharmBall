@@ -16,7 +16,10 @@
 # python
 !requirements.txt
 !src
-!src/**/*.py
+!src/*.py
+!src/plugins
+!src/plugins/*.py
+
 !tests
 !tests/**/*.py
 
