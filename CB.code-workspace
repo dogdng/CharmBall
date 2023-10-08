@@ -17,11 +17,11 @@
         "files.associations": {
             ".env*": "properties",
             "*.py": "python",
+            "*.pyi": "python",
             "*.json": "json"
         },
         "[python]": {
             "editor.defaultFormatter": "ms-python.black-formatter"
-        },
-        "python.formatting.provider": "none"
+        }
     }
 }

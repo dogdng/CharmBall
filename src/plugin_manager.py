@@ -6,27 +6,21 @@ class PluginBase(metaclass = ABCMeta):
         pass
 
     @abstractmethod
-    def process(self, text):
-        tb = sys.exception().__traceback__
-        raise NotImplementedError(self.__class__.__name__).with_traceback(tb)
+    def activate(self, text):
+        raise NotImplementedError(self.__class__.__name__)
 
     @abstractmethod
-    def process2(self):
-        tb = sys.exception().__traceback__
-        raise NotImplementedError(self.__class__.__name__).with_traceback(tb)
+    def clicked(self):
+        raise NotImplementedError(self.__class__.__name__)
 
 class PluginManager(object):
     __plugins = {}
 
-    def process(self, text, plugins=()):
+    def load(self):
         try:
-            if plugins == ():
-                for plugin_name in self.__plugins.keys():
-                    text = self.__plugins[plugin_name]().process(text)
-            else:
-                for plugin_name in plugins:
-                    text = self.__plugins[plugin_name]().process(text)
-            return text
+            for plugin_name in self.__plugins.keys():
+                text = self.__plugins[plugin_name]().activate()
+                print(text)
         except Exception as ex:
             print("Plugin process error!")
             raise ex

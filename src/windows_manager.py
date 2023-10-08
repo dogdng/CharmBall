@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os, PySide6
+from time import sleep
 
 dirname = os.path.dirname(PySide6.__file__)
 plugin_path = os.path.join(dirname, "plugins", "platforms")
@@ -14,6 +15,9 @@ from tray_button import TrayButton
 from float_ball import FloatBall
 from left_click_window import LeftClickWindow
 
+from plugin_manager import PluginManager
+from plugins import *
+
 
 class WindowsManager():
     __windows_dict = {}
@@ -23,6 +27,15 @@ class WindowsManager():
         self.app = QtWidgets.QApplication(args)
         self.__register_windows()
         self.tray = TrayButton()
+
+        try:
+            plugin = PluginManager()
+            processed = plugin.load()
+        except Exception as ex:
+            # TODO：插件出错要给出必要的提示
+            print(ex)
+        finally:
+            pass
 
     def __register_windows(self):
         self.__windows_dict[Windows.BALL] = FloatBall(self.app)
@@ -37,7 +50,7 @@ class WindowsManager():
 
     @QtCore.Slot(Windows)
     def switch_activate_window(self, target: Windows, center: QtCore.QPoint) -> None:
-        print("center is {0}".format(center))
+        # print("center is {0}".format(center))
         for win in self.__windows_dict.values():
             if not win.isHidden():
                 win.hide()
