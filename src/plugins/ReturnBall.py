@@ -1,6 +1,6 @@
 from plugin_manager import *
 
-@PluginManager.register('return_ball')
+@PluginManager.register('ReturnBall')
 class ReturnBall(PluginBase):
     def __init__(self) -> None:
         super().__init__()

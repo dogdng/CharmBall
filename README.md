@@ -3,6 +3,11 @@
 .\.venv\Scripts\Activate.ps1
 ```
 
+直接打包成exe
+```
+pyinstaller.exe --distpath ./dist --workpath ./build --specpath ./build --clean --onefile --name "fball" --windowed -i ../resources/CB.ico ./src/main.py -p ./src
+```
+
 
 https://blog.csdn.net/weixin_44446598/article/details/115031335
 
