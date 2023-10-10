@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
-import os, psutil, sys, threading, time
+import psutil, sys
 from PySide6 import QtGui, QtWidgets, QtCore
-from PySide6.QtWidgets import QWidget, QVBoxLayout
+from PySide6.QtWidgets import QWidget, QApplication
 from PySide6.QtCore import Qt, QPoint, QSize, QTimer
 from PySide6.QtGui import QPainter, QPalette, QFont, QColor
-
+from pynput.mouse import Controller
 import utils
 from interface import Windows
 
 class FloatBall(QWidget):
     click_ball = QtCore.Signal(Windows, QPoint) # 信号必须放在方法外面
+    alongside_trigger = QtCore.Signal()
     __ball_radius : int
     __memory_percent = 0.0
     __cpu_percent = 0.0
@@ -19,29 +20,40 @@ class FloatBall(QWidget):
     def __init__(self, app):
         super().__init__()
         self.app = app
+        self.__is_window_move = True
+        self.__alongside = False
+        self.__alongside_windows = False
         self.info = SystemInfo()
+        self.__mouse_controller = Controller()
 
         self.setWindowTitle("C&B")
         # 无边框，窗口置顶
-        self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint | Qt.WindowType.Window)
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint
+                            | Qt.WindowType.WindowStaysOnTopHint
+                            | Qt.WindowType.Window
+                            | Qt.WindowType.Popup
+                            | Qt.WindowType.Tool # 隐藏任务栏图标
+                            )
         # 窗口背景透明
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
         self.setAttribute(Qt.WidgetAttribute.WA_ShowWithoutActivating)
+        # 设置透明度
+        # self.setWindowOpacity(0.9)
         '''
         悬浮球尺寸和位置
         '''
         screen_size = QtGui.QGuiApplication.primaryScreen().size()
+        self.screen_width = screen_size.width()
+        self.screen_height = screen_size.height()
         self.__ball_radius = round(min(screen_size.width(), screen_size.height()) * self.__ball_radius_screen_ratio)
-        self.window_size = QSize(self.__ball_radius * 2, self.__ball_radius * 2)
+        self.__ball_diameter = self.__ball_radius * 2
+        self.window_size = QSize(self.__ball_diameter, self.__ball_diameter)
+        self.__alongside_width = self.__ball_radius // 6
         self.origin = QPoint(screen_size.width()//2 - self.__ball_radius, screen_size.height()//2 - self.__ball_radius)
-        self.setGeometry(self.origin.x() - self.__ball_radius, self.origin.y() - self.__ball_radius, self.window_size.width(), self.window_size.height())
+        self.setGeometry(self.origin.x() - self.__ball_radius, self.origin.y() - self.__ball_radius, self.__ball_diameter, self.__ball_diameter)
 
-        # 设置透明度
-        # self.setWindowOpacity(0.9)
         # 鼠标手状
         self.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.is_window_move = True
-
 
         # 背景
         self.path = QtGui.QPainterPath()
@@ -119,7 +131,7 @@ class FloatBall(QWidget):
         palette = QPalette()
         self.label.setFont(font)
 
-        palette.setColor(QPalette.ColorRole.WindowText, "#CCCCCC")
+        palette.setColor(QPalette.ColorRole.WindowText, "#B8B6B0")
         self.label.setPalette(palette)
         # 将文本垂直和水平居中显示
         self.label.setAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft)
@@ -130,23 +142,28 @@ class FloatBall(QWidget):
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_system_info)
         self.timer.start(self.__system_info_update_period * 1000) # millisecond
+        self.update()
 
     def update_system_info(self):
-        # 内存占用
-        self.__memory_percent = self.info.get_memory_percent()
-        # self.__memory_percent = self.__memory_percent + 5 if self.__memory_percent < 100 else 0
-        # CPU占用
-        self.__cpu_percent = self.info.get_cpu_percent()
-        # self.__cpu_percent = self.__cpu_percent + 5 if self.__cpu_percent < 100 else 0
-        # 网速
-        [sent_now, recv_now] = self.info.get_net_speed()
-        sent = (sent_now - self.sent_history)/1024/self.__system_info_update_period  # 算出1秒后的差值
-        recv = (recv_now - self.recv_history)/1024/self.__system_info_update_period
-        self.sent_history = sent_now
-        self.recv_history = recv_now
-        self.__net_speed = "↑:{0}\n↓:{1}".format(self.net_speed_format(sent), self.net_speed_format(recv))
-        self.net_speed_format(recv_now)
-        self.update()
+        try:
+            # 内存占用
+            self.__memory_percent = self.info.get_memory_percent()
+            # self.__memory_percent = self.__memory_percent + 5 if self.__memory_percent < 100 else 0
+            # CPU占用
+            self.__cpu_percent = self.info.get_cpu_percent()
+            # self.__cpu_percent = self.__cpu_percent + 5 if self.__cpu_percent < 100 else 0
+            # 网速
+            [sent_now, recv_now] = self.info.get_net_speed()
+        except:
+            pass
+        else:
+            sent = (sent_now - self.sent_history)/1024/self.__system_info_update_period  # 算出1秒后的差值
+            recv = (recv_now - self.recv_history)/1024/self.__system_info_update_period
+            self.sent_history = sent_now
+            self.recv_history = recv_now
+            self.__net_speed = "↑:{0}\n↓:{1}".format(self.net_speed_format(sent), self.net_speed_format(recv))
+            self.net_speed_format(recv_now)
+            self.update()
 
     def net_speed_format(self, speed: float) -> str:
         result = ""
@@ -157,15 +174,15 @@ class FloatBall(QWidget):
         elif speed < 1000.0:
             result = "{0:>.0f}.K".format(speed)
         elif speed < 10000.0:
-            result = "{0:>.2f}M".format(speed/1000.0)
+            result = "{0:>.2f}M".format(speed/1024.0)
         elif speed < 100000.0:
-            result = "{0:>.1f}M".format(speed/1000.0)
+            result = "{0:>.1f}M".format(speed/1024.0)
         elif speed < 1000000.0:
-            result = "{0:>.0f}.M".format(speed/1000.0)
+            result = "{0:>.0f}.M".format(speed/1024.0)
         elif speed < 10000000.0:
-            result = "{0:>.2f}G".format(speed/1000000.0)
+            result = "{0:>.2f}G".format(speed/1048576.0) # 1024 * 1024
         else: # May be enough at 2023
-            result = "{0:>.1f}G".format(speed/1000000.0)
+            result = "{0:>.1f}G".format(speed/1048576.0)
         return result
 
     def set_origin(self, origin: QPoint):
@@ -175,31 +192,34 @@ class FloatBall(QWidget):
 
     def activate(self) -> None:
         # threading.Thread(target=utils.anime_WindowOpacity, args=(self,)).start()
-        self.setGeometry(self.origin.x() - self.__ball_radius, self.origin.y() - self.__ball_radius, self.window_size.width(), self.window_size.height())
+        self.setGeometry(self.origin.x() - self.__ball_radius, self.origin.y() - self.__ball_radius, self.__ball_diameter, self.__ball_diameter)
         self.show()
 
     def mousePressEvent(self, event):
+        '鼠标按下'
         if event.button() == Qt.MouseButton.LeftButton:
-            self.is_window_move = True
+            self.__is_window_move = True
             self.drag_position = event.globalPos() - self.frameGeometry().topLeft()
             self.mouse_pos = event.globalPos()
             self.window_pos = self.pos()
             event.accept() # 将事件标记为已处理
 
     def mouseMoveEvent(self, event):
+        '鼠标移动'
         if event.buttons() == Qt.MouseButton.LeftButton and self.drag_position is not None:
-            self.is_window_move = False
+            self.__is_window_move = False
             diff = event.globalPos() - self.mouse_pos
             new_pos = self.window_pos + diff
-            new_pos = utils.limit_window_in_bounds(self.app, new_pos, self.window_size)
+            # 限制和贴边功能冲突 new_pos = utils.limit_window_in_bounds(self.app, new_pos, self.window_size)
             self.move(new_pos)
             self.origin = QPoint(new_pos.x() + self.__ball_radius, new_pos.y() + self.__ball_radius)
             event.accept()
 
     def mouseReleaseEvent(self, event):
+        '鼠标释放'
         if event.button() == Qt.MouseButton.LeftButton:
             # 若菜单已经显示则隐藏
-            if self.is_window_move: # 防止move之后还会触发
+            if self.__is_window_move: # 防止move之后还会触发
                 # geometry().center()方法获取到的宽度和高度的值每次都会减1，未定位到具体原因
                 # self.click_ball.emit(Windows.LEFT, self.geometry().center())
                 self.click_ball.emit(Windows.LEFT, self.origin)
@@ -211,21 +231,93 @@ class FloatBall(QWidget):
             # debug
             sys.exit(0)
 
+    def enterEvent(self, event):
+        '鼠标进入'
+        pos = self.frameGeometry().topLeft()
+        if self.__alongside:
+            if pos.x() + self.__ball_diameter >= self.screen_width:
+                # 右
+                self.alongside_appear(self.screen_width - self.__ball_diameter, pos.y(), "right")
+            elif pos.x() <= 0:
+                # 左
+                self.alongside_appear(0, pos.y(), "left")
+            elif pos.y() <= 0:
+                # 上
+                self.alongside_appear(pos.x(), 0, "up")
+            event.accept()
+
+    def alongside_appear(self, x, y, direction):
+        '侧边出现'
+        self.__alongside_windows = False
+        # 避免来回跳，即鼠标很靠边时触发了enterEvent，球弹出来之后自己脱离了鼠标，在这个区域会来回跳
+        if direction == 'right':
+            self.setGeometry(x + self.__alongside_width, y, self.__ball_diameter, self.__ball_diameter)
+        elif direction == 'left':
+            self.setGeometry(x - self.__alongside_width, y, self.__ball_diameter, self.__ball_diameter)
+        else:
+            self.setGeometry(x, y - self.__alongside_width, self.__ball_diameter, self.__ball_diameter)
+        self.update()
+        # self.__mouse_controller.position = (x + self.__ball_radius, y + self.__ball_radius * 1.35)
+        self.__alongside = False
+
+    def leaveEvent(self, event):
+        '鼠标移走'
+        pos = self.frameGeometry().topLeft()
+        if not self.__alongside:
+            if pos.x() + self.__ball_diameter >= self.screen_width:
+                self.alongside_disappear(self.screen_width - self.__alongside_width, pos.y(), 'right')
+            elif pos.x() <= 0:
+                self.alongside_disappear(self.__alongside_width - self.__ball_diameter, pos.y(), 'left')
+            elif pos.y() <= 0:
+                self.alongside_disappear(pos.x(), self.__alongside_width - self.__ball_diameter, 'up')
+        # 防止被任务栏遮住
+        if pos.y() + self.__ball_diameter >= self.screen_height:
+            self.setGeometry(pos.x(), self.screen_height - self.__ball_diameter, self.__ball_diameter, self.__ball_diameter)
+            self.__alongside = False
+            self.__alongside_windows = False
+        event.accept()
+
+    def alongside_disappear(self, x, y, direction):
+        '侧边贴边'
+        self.__alongside = True
+        self.__alongside_windows = True
+        num = len(QApplication.screens())
+        if direction == 'right':
+            self.setGeometry(x, y, self.__alongside_width, self.__ball_diameter)
+        elif direction == 'left':
+            # 防止跨屏
+            if num < 2:
+                self.setGeometry(x, y, self.__ball_diameter, self.__ball_diameter)
+            else:
+                self.setGeometry(0, y, self.__alongside_width, self.__ball_diameter)
+        else:
+            if num < 2:
+                self.setGeometry(x, y, self.__ball_diameter, self.__ball_diameter)
+            else:
+                self.setGeometry(x, 0, self.__ball_diameter, self.__alongside_width)
+        self.update()
+
+
     def paintEvent(self, event):
         '重绘'
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)  # 抗锯齿
         # 背景
         painter.setClipPath(self.path)
-        painter.fillRect(self.rect(), QtGui.QBrush(QColor(150, 150, 150, 20)))
-        # 外圈弧形
-        painter.setPen(self.memory_pen)
-        painter.drawArc(self.memory_arc_rect, self.arc_start_angle, round(self.__memory_percent * self.arc_angle_ratio))
-        # 底部弧形
-        painter.setPen(self.cpu_pen)
-        painter.drawArc(self.cpu_arc_rect, self.arc_start_angle, round(self.__cpu_percent * self.arc_angle_ratio))
-        # 中心的网速label
-        self.label.setText(self.__net_speed)
+        brush = QtGui.QBrush(QColor(150, 150, 150, 20))
+        if self.__alongside_windows:
+            brush.setColor("#0099F7")
+            painter.fillRect(self.rect(), brush)
+        else:
+            painter.fillRect(self.rect(), brush)
+            # 外圈弧形
+            painter.setPen(self.memory_pen)
+            painter.drawArc(self.memory_arc_rect, self.arc_start_angle, round(self.__memory_percent * self.arc_angle_ratio))
+            # 底部弧形
+            painter.setPen(self.cpu_pen)
+            painter.drawArc(self.cpu_arc_rect, self.arc_start_angle, round(self.__cpu_percent * self.arc_angle_ratio))
+            # 中心的网速label
+            self.label.setText(self.__net_speed)
 
         painter.end()
 

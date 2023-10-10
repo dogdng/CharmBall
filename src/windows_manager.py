@@ -28,6 +28,7 @@ class WindowsManager():
         self.__register_windows()
         self.tray = TrayButton()
 
+        # FIXME:plugin的写法导致打包的exe执行报错
         # try:
         #     plugin = PluginManager()
         #     processed = plugin.load()

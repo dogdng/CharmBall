@@ -9,8 +9,6 @@ pyinstaller.exe --distpath ./dist --workpath ./build --specpath ./build --clean 
 ```
 
 
-https://blog.csdn.net/weixin_44446598/article/details/115031335
-
 悬浮球
 
  1. 启动之后展示为悬浮球
