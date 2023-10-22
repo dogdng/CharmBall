@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
-import psutil, sys
+import psutil, sys, time
 from PySide6 import QtGui, QtWidgets, QtCore
 from PySide6.QtWidgets import QWidget, QApplication
 from PySide6.QtCore import Qt, QPoint, QSize, QTimer
 from PySide6.QtGui import QPainter, QPalette, QFont, QColor
 from pynput.mouse import Controller
-import utils
+
 from interface import Windows
 
 class FloatBall(QWidget):
-    click_ball = QtCore.Signal(Windows, QPoint) # 信号必须放在方法外面
+    '''悬浮球窗口'''
+    left_click_ball = QtCore.Signal(Windows, QPoint) # 信号必须放在方法外面
+    right_click_ball = QtCore.Signal(Windows, QPoint) # 信号必须放在方法外面
     alongside_trigger = QtCore.Signal()
     __ball_radius : int
     __memory_percent = 0.0
@@ -39,9 +41,7 @@ class FloatBall(QWidget):
         self.setAttribute(Qt.WidgetAttribute.WA_ShowWithoutActivating)
         # 设置透明度
         # self.setWindowOpacity(0.9)
-        '''
-        悬浮球尺寸和位置
-        '''
+        ''' 悬浮球尺寸和位置 '''
         screen_size = QtGui.QGuiApplication.primaryScreen().size()
         self.screen_width = screen_size.width()
         self.screen_height = screen_size.height()
@@ -59,11 +59,9 @@ class FloatBall(QWidget):
         self.path = QtGui.QPainterPath()
         self.path.addRoundedRect(self.rect(), self.__ball_radius, self.__ball_radius)
         self.arc_start_angle = 225 * 16
-        '''
-        外部大扇形环 内存使用
-        '''
+        ''' 外部大扇形环 显示内存使用 '''
         # 弧形条
-        memory_gradient = QtGui.QConicalGradient(self.rect().center(), -90)
+        memory_gradient = QtGui.QConicalGradient(self.rect().center(), -90) # 沿圆弧方向渐变
         # Wedding Day Blues 绿 -> 黄 -> 红
         # gradient.setColorAt(0, QColor("#FF0080"))
         # gradient.setColorAt(0.5, QColor("#FFF200"))
@@ -117,9 +115,7 @@ class FloatBall(QWidget):
             (self.width() - cpu_arc_diameter) / 2, (self.height() + memory_arc_diameter) / 2 - cpu_arc_diameter, cpu_arc_diameter, cpu_arc_diameter
         )
 
-        '''
-        中心标签 网速
-        '''
+        ''' 中心标签 网速 '''
         [self.sent_history, self.recv_history] = self.info.get_net_speed()
         # 设置标签
         self.label = QtWidgets.QLabel(self)
@@ -130,15 +126,12 @@ class FloatBall(QWidget):
         palette.setColor(QPalette.ColorRole.WindowText, Qt.GlobalColor.red)
         palette = QPalette()
         self.label.setFont(font)
-
         palette.setColor(QPalette.ColorRole.WindowText, "#B8B6B0")
         self.label.setPalette(palette)
         # 将文本垂直和水平居中显示
         self.label.setAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft)
         self.label.setGeometry(self.__ball_radius//2, self.__ball_radius//2, self.__ball_radius, self.__ball_radius)
-        '''
-        定时更新要显示的内容
-        '''
+        ''' 定时更新要显示的内容 '''
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_system_info)
         self.timer.start(self.__system_info_update_period * 1000) # millisecond
@@ -202,7 +195,14 @@ class FloatBall(QWidget):
             self.drag_position = event.globalPos() - self.frameGeometry().topLeft()
             self.mouse_pos = event.globalPos()
             self.window_pos = self.pos()
-            event.accept() # 将事件标记为已处理
+        elif event.button() == Qt.MouseButton.RightButton:
+            '''按下右键立即显示矩阵，放开之后切换回悬浮球。'''
+            self.right_click_ball.emit(Windows.RIGHT, self.origin)
+            self.mouse_pos = event.globalPos()
+            self.window_pos = self.pos()
+            exit(0)
+        super(FloatBall, self).mousePressEvent(event)
+        # event.accept() # 将事件标记为已处理
 
     def mouseMoveEvent(self, event):
         '鼠标移动'
@@ -221,15 +221,13 @@ class FloatBall(QWidget):
             # 若菜单已经显示则隐藏
             if self.__is_window_move: # 防止move之后还会触发
                 # geometry().center()方法获取到的宽度和高度的值每次都会减1，未定位到具体原因
-                # self.click_ball.emit(Windows.LEFT, self.geometry().center())
-                self.click_ball.emit(Windows.LEFT, self.origin)
+                # self.left_click_ball.emit(Windows.LEFT, self.geometry().center())
+                self.left_click_ball.emit(Windows.LEFT, self.origin)
             else:
                 self.drag_position = None
-                event.accept()
         elif event.button() == Qt.MouseButton.RightButton:
-            event.accept()
-            # debug
-            sys.exit(0)
+            pass
+        event.accept()
 
     def enterEvent(self, event):
         '鼠标进入'

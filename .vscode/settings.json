@@ -15,9 +15,9 @@
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
-    "editor.defaultFormatter": "ms-python.vscode-pylance",
     "python.analysis.typeCheckingMode": "basic",
     "[python]": {
-        "editor.defaultFormatter": "ms-python.python"
-    }
+        "editor.defaultFormatter": "ms-python.autopep8"
+    },
+    "autopep8.args": ["--global-config"]
 }

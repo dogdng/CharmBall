@@ -10,9 +10,9 @@ import utils, interface
 
 
 
-class LeftClickWindow(QWidget):
+class MatrixMenu(QWidget):
     '单击功能窗口'
-    switch_ball = QtCore.Signal(interface.Windows, QPoint) # 信号必须放在方法外面
+    switch_default = QtCore.Signal(interface.Windows, QPoint) # 信号必须放在方法外面
     origin = QPoint()
     def __init__(self, app):
         super().__init__()
@@ -201,7 +201,7 @@ class LeftClickWindow(QWidget):
     按钮槽函数
     """
     def switch_to_window_a(self):
-        self.switch_ball.emit(interface.Windows.BALL, self.origin)
+        self.switch_default.emit(interface.Windows.DEFAULT, self.origin)
 
     def mission_view(self):
         pass

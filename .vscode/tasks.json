@@ -56,10 +56,12 @@
             },
         },
         {
-            "label": "run",
+            "label": "debug",
             "type": "shell",
             "command": "python",
             "args": [
+                "-m",
+                "pdb",
                 "main.py"
             ],
             "detail": "运行main.py",
