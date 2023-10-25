@@ -2,7 +2,7 @@
 
 import sys, threading
 from PySide6 import QtGui, QtWidgets, QtCore
-from PySide6.QtCore import Qt, QPoint, QSize
+from PySide6.QtCore import Qt, QPoint, QSize, QTimer
 from PySide6.QtGui import QIcon, QPainter, QCursor
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QGridLayout
 
@@ -17,8 +17,12 @@ class MatrixMenu(QWidget):
     def __init__(self, app):
         super().__init__()
         self.app = app
-        self.setWindowTitle("Window B")
-        self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint | Qt.WindowType.Window | Qt.WindowType.Tool)
+        self.setWindowTitle("Matrix Menu")
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint
+                            | Qt.WindowType.WindowStaysOnTopHint
+                            | Qt.WindowType.Popup
+                            | Qt.WindowType.Window
+                            | Qt.WindowType.Tool)
 
         # self.origin
         self.window_size = QSize(202, 200)
@@ -35,28 +39,11 @@ class MatrixMenu(QWidget):
 
     def add_buttons(self):
         # 设置布局
-
         # 一个垂直布局，第一层、第三层套两个网格布局，第二层放Slider
-
-        layout = QVBoxLayout()
         # 设置布局为垂直居中对齐
-        layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
-        # 将布局应用到父控件
-        self.setLayout(layout)
+        layout = QGridLayout()
+        layout.setAlignment(Qt.AlignmentFlag.AlignJustify) #AlignCenter)
 
-        self.scroll1 = ScrollableButtonGrid()
-        # self.scroll1.resize(300,20)
-
-        self.scroll2 = ScrollableButtonGrid()
-        # self.scroll2.resize(300,20)
-
-        self.layout().addWidget(self.scroll1)
-
-        # self.slider = CircularSlider()
-        # self.slider.setFixedSize(300, 300)
-        # self.layout().addWidget(self.slider)
-
-        self.layout().addWidget(self.scroll2)
 
         # 按钮样式
         button_style = """
@@ -81,31 +68,32 @@ class MatrixMenu(QWidget):
         self.button1.setIconSize(QSize(50, 50))
         self.button1.setFixedSize(50, 50)
         self.button1.clicked.connect(self.mission_view)
-        self.scroll1.g_layout.addWidget(self.button1, 0, 0)
+        layout.addWidget(self.button1, 0, 0)
         self.button1.setStyleSheet(button_style)
+
+        self.close_button = MyQPushButton(self)
+        self.close_button.setIcon(QIcon("./resources/closemenu.png"))
+        self.close_button.setIconSize(QSize(50, 50))
+        self.close_button.setFixedSize(50, 50)
+        self.close_button.clicked.connect(self.switch_to_default_window)
+        layout.addWidget(self.close_button, 0, 1)
+        self.close_button.setStyleSheet(button_style)
 
         self.button3 = MyQPushButton(self)
         self.button3.setIcon(QIcon("./resources/screen.png"))
         self.button3.setIconSize(QSize(50, 50))
         self.button3.setFixedSize(50, 50)
         self.button3.clicked.connect(self.change_screen)
-        self.scroll1.g_layout.addWidget(self.button3, 0, 2)
+        layout.addWidget(self.button3, 0, 2)
         self.button3.setStyleSheet(button_style)
 
-        self.close_button = MyQPushButton(self)
-        self.close_button.setIcon(QIcon("./resources/closemenu.png"))
-        self.close_button.setIconSize(QSize(50, 50))
-        self.close_button.setFixedSize(50, 50)
-        self.close_button.clicked.connect(self.switch_to_window_a)
-        self.scroll1.g_layout.addWidget(self.close_button, 0, 3)
-        self.close_button.setStyleSheet(button_style)
 
         self.button6 = MyQPushButton(self)
         self.button6.setIcon(QIcon("./resources/desktop.png"))
         self.button6.setIconSize(QSize(50, 50))
         self.button6.setFixedSize(50, 50)
         self.button6.clicked.connect(self.back_desktop)
-        self.scroll2.g_layout.addWidget(self.button6, 0, 0)
+        layout.addWidget(self.button6, 1, 0)
         self.button6.setStyleSheet(button_style)
 
         self.button7 = MyQPushButton(self)
@@ -113,7 +101,7 @@ class MatrixMenu(QWidget):
         self.button7.setIconSize(QSize(50, 50))
         self.button7.setFixedSize(50, 50)
         self.button7.clicked.connect(self.open_taskmgr)
-        self.scroll2.g_layout.addWidget(self.button7, 0, 1)
+        layout.addWidget(self.button7, 1, 1)
         self.button7.setStyleSheet(button_style)
 
         self.button8 = MyQPushButton(self)
@@ -121,7 +109,7 @@ class MatrixMenu(QWidget):
         self.button8.setIconSize(QSize(45, 45))
         self.button8.setFixedSize(50, 50)
         self.button8.clicked.connect(self.open_utools)
-        self.scroll2.g_layout.addWidget(self.button8, 0, 2)
+        layout.addWidget(self.button8, 1, 2)
         self.button8.setStyleSheet(button_style)
 
         self.button9 = MyQPushButton(self)
@@ -129,7 +117,7 @@ class MatrixMenu(QWidget):
         self.button9.setIconSize(QSize(50, 50))
         self.button9.setFixedSize(50, 50)
         self.button9.clicked.connect(self.take_screenshot)
-        self.scroll2.g_layout.addWidget(self.button9, 0, 3)
+        layout.addWidget(self.button9, 2, 1)
         self.button9.setStyleSheet(button_style)
 
         self.button91 = MyQPushButton(self)
@@ -137,22 +125,18 @@ class MatrixMenu(QWidget):
         self.button91.setIconSize(QSize(50, 50))
         self.button91.setFixedSize(50, 50)
         self.button91.clicked.connect(self.take_screenshot)
-        self.scroll2.g_layout.addWidget(self.button91, 0, 4)
+        layout.addWidget(self.button91, 3, 2)
         self.button91.setStyleSheet(button_style)
 
-        # 设置布局为垂直居中对齐
-        layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        # 将布局应用到父控件
         self.setLayout(layout)
 
     """
     鼠标事件
     """
-
     def mouseReleaseEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
             self.drag_position = None
-            event.accept()
+            # event.accept()
 
     def mousePressEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
@@ -161,7 +145,8 @@ class MatrixMenu(QWidget):
             # 范围判定用
             self.mouse_pos = event.globalPos()
             self.window_pos = self.pos()
-            event.accept()
+            self.switch_to_default_window()
+        return super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event):
         # print(self.width(),self.height())
@@ -172,7 +157,10 @@ class MatrixMenu(QWidget):
             new_pos = utils.limit_window_in_bounds(self.app, new_pos, QSize(self.width(), self.height()))
             self.move(new_pos)
             self.origin = QPoint(new_pos.x() + round(self.width()/2), new_pos.y() + round(self.height()/2))
-            event.accept()
+            # event.accept()
+
+    def wheelEvent(self, event):
+        print(f"滚轮:{event.angleDelta()}")
 
     def activate(self) -> None:
         n_pos = QPoint(self.origin.x() - round(self.width() / 2), self.origin.y() - round(self.height() / 2))
@@ -200,7 +188,7 @@ class MatrixMenu(QWidget):
     """
     按钮槽函数
     """
-    def switch_to_window_a(self):
+    def switch_to_default_window(self):
         self.switch_default.emit(interface.Windows.DEFAULT, self.origin)
 
     def mission_view(self):
