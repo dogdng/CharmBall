@@ -1,12 +1,17 @@
 # -*- coding: utf-8 -*-
 
-import sys, threading
+import os, sys, threading
 from PySide6 import QtGui, QtWidgets, QtCore
 from PySide6.QtCore import Qt, QPoint, QSize, QTimer
 from PySide6.QtGui import QIcon, QPainter, QCursor
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QGridLayout
 
 import utils, interface
+
+from images.closemenu_png import img as closemenu_png
+from images.mission_png import img as mission_png
+from images.screen_png import img as screen_png
+from images.desktop_png import img as desktop_png
 
 
 
@@ -20,7 +25,7 @@ class MatrixMenu(QWidget):
         self.setWindowTitle("Matrix Menu")
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint
                             | Qt.WindowType.WindowStaysOnTopHint
-                            | Qt.WindowType.Popup
+                            # | Qt.WindowType.Popup
                             | Qt.WindowType.Window
                             | Qt.WindowType.Tool)
 
@@ -36,6 +41,15 @@ class MatrixMenu(QWidget):
     def set_origin(self, origin: QPoint):
         '''设置原点：窗口中心坐标'''
         self.origin = origin
+
+    def get_icon(self, img_data):
+        '''通过base64编码的图片字符串获取QIcon对象'''
+        data = QtCore.QByteArray().fromBase64(img_data)
+        image = QtGui.QImage()
+        image.loadFromData(data)
+        pix = QtGui.QPixmap.fromImage(image)
+        return QIcon(pix)
+
 
     def add_buttons(self):
         # 设置布局
@@ -64,7 +78,7 @@ class MatrixMenu(QWidget):
         """
 
         self.button1 = MyQPushButton(self)
-        self.button1.setIcon(QIcon("./resources/mission.png"))
+        self.button1.setIcon(self.get_icon(mission_png))
         self.button1.setIconSize(QSize(50, 50))
         self.button1.setFixedSize(50, 50)
         self.button1.clicked.connect(self.mission_view)
@@ -72,7 +86,7 @@ class MatrixMenu(QWidget):
         self.button1.setStyleSheet(button_style)
 
         self.close_button = MyQPushButton(self)
-        self.close_button.setIcon(QIcon("./resources/closemenu.png"))
+        self.close_button.setIcon(self.get_icon(closemenu_png))
         self.close_button.setIconSize(QSize(50, 50))
         self.close_button.setFixedSize(50, 50)
         self.close_button.clicked.connect(self.switch_to_default_window)
@@ -80,7 +94,8 @@ class MatrixMenu(QWidget):
         self.close_button.setStyleSheet(button_style)
 
         self.button3 = MyQPushButton(self)
-        self.button3.setIcon(QIcon("./resources/screen.png"))
+
+        self.button3.setIcon(self.get_icon(screen_png))
         self.button3.setIconSize(QSize(50, 50))
         self.button3.setFixedSize(50, 50)
         self.button3.clicked.connect(self.change_screen)
@@ -89,7 +104,7 @@ class MatrixMenu(QWidget):
 
 
         self.button6 = MyQPushButton(self)
-        self.button6.setIcon(QIcon("./resources/desktop.png"))
+        self.button6.setIcon(self.get_icon(desktop_png))
         self.button6.setIconSize(QSize(50, 50))
         self.button6.setFixedSize(50, 50)
         self.button6.clicked.connect(self.back_desktop)
@@ -136,7 +151,7 @@ class MatrixMenu(QWidget):
     def mouseReleaseEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
             self.drag_position = None
-            # event.accept()
+            event.accept()
 
     def mousePressEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
@@ -157,7 +172,7 @@ class MatrixMenu(QWidget):
             new_pos = utils.limit_window_in_bounds(self.app, new_pos, QSize(self.width(), self.height()))
             self.move(new_pos)
             self.origin = QPoint(new_pos.x() + round(self.width()/2), new_pos.y() + round(self.height()/2))
-            # event.accept()
+            event.accept()
 
     def wheelEvent(self, event):
         print(f"滚轮:{event.angleDelta()}")

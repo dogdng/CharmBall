@@ -11,7 +11,7 @@ from interface import Windows
 class FloatBall(QWidget):
     '''悬浮球窗口'''
     left_click_ball = QtCore.Signal(Windows, QPoint) # 信号必须放在方法外面
-    # right_click_ball = QtCore.Signal(Windows, QPoint) # 信号必须放在方法外面
+    right_click_ball = QtCore.Signal(Windows, QPoint) # 信号必须放在方法外面
     alongside_trigger = QtCore.Signal()
     __ball_radius : int
     __memory_percent = 0.0
@@ -197,10 +197,10 @@ class FloatBall(QWidget):
             self.window_pos = self.pos()
         elif event.button() == Qt.MouseButton.RightButton:
             # self.right_click_ball.emit(Windows.RIGHT, self.origin)
-            # self.mouse_pos = event.globalPos()
-            # self.window_pos = self.pos()
+            self.mouse_pos = event.globalPos()
+            self.window_pos = self.pos()
             exit(0)
-        super(FloatBall, self).mousePressEvent(event)
+        return super().mousePressEvent(event)
         # event.accept() # 将事件标记为已处理
 
     def mouseMoveEvent(self, event):
