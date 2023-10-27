@@ -199,7 +199,6 @@ class FloatBall(QWidget):
             # self.right_click_ball.emit(Windows.RIGHT, self.origin)
             self.mouse_pos = event.globalPos()
             self.window_pos = self.pos()
-            exit(0)
         return super().mousePressEvent(event)
         # event.accept() # 将事件标记为已处理
 
@@ -225,7 +224,7 @@ class FloatBall(QWidget):
             else:
                 self.drag_position = None
         elif event.button() == Qt.MouseButton.RightButton:
-            pass
+            sys.exit(0)
         event.accept()
 
     def enterEvent(self, event):
