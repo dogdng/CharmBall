@@ -10,20 +10,17 @@ from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
+import utils
+from images.CB_ico import img as icon
+
 class TrayButton(QWidget):
-    '''
-    系统托盘按钮
-    '''
+    '''系统托盘按钮'''
     def __init__(self) -> None:
         super().__init__()
         self.tray_icon = QSystemTrayIcon(self)
         # 系统托盘
-        self.config_tray()
-
-    def config_tray(self):
-        self.tray_icon.setIcon(QIcon("./resources/EasingFunctionsIcon.png"))
+        self.tray_icon.setIcon(utils.get_icon_from_base64(icon))
         self.tray_icon.activated.connect(self.tray_icon_activated)
-        # self.tray_icon.show()
 
         # 创建右键菜单
         self.tray_menu = QMenu(self)
@@ -37,11 +34,8 @@ class TrayButton(QWidget):
         # 显示系统托盘图标
         self.tray_icon.show()
 
-
-    """
-    系统托盘
-    """
     def tray_icon_activated(self, reason):
-        if reason == QSystemTrayIcon.Trigger:
+        """单击系统托盘槽函数"""
+        if reason == QSystemTrayIcon.ActivationReason.Trigger:
             print("tray button triggered!")
 

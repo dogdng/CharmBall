@@ -43,8 +43,8 @@ def get_devicePixelRatio(screen):
     return devicePixelRatio
 
 
-# 获得焦点屏幕
 def get_focus_screen(app):
+    '''获得焦点屏幕'''
     # 根据四周有无屏幕，哪些方向的拖动时允许的
     screens = app.screens()
     # 首先判断焦点屏幕
@@ -68,5 +68,12 @@ def get_focus_screen(app):
 
     # 将焦点屏幕从screens列表取出
     focus_screen = screens.pop(index)
-
     return focus_screen
+
+def get_icon_from_base64(img_data):
+    '''通过base64编码的图片字符串获取QIcon对象'''
+    data = QtCore.QByteArray().fromBase64(img_data)
+    image = QtGui.QImage()
+    image.loadFromData(data)
+    pix = QtGui.QPixmap.fromImage(image)
+    return QtGui.QIcon(pix)

@@ -14,12 +14,15 @@ from tray_button import TrayButton
 from float_ball import FloatBall
 from matrix_menu import MatrixMenu
 
+from images.CB_ico import img as icon
+
 class WindowsManager():
     __windows_dict = {}
     __current_window = Windows.DEFAULT
 
     def __init__(self, args) -> None:
         self.app = QtWidgets.QApplication(args)
+        self.app.setWindowIcon(utils.get_icon_from_base64(icon))
         self.__register_windows()
         self.tray = TrayButton()
 

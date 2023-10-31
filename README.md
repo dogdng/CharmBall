@@ -10,7 +10,7 @@ python -m pdb main.py
 
 直接打包成exe
 ```
-pyinstaller.exe --distpath ./dist --workpath ./build --specpath ./build --clean --onefile --name "fball" --windowed -i ../resources/CB.ico ./src/main.py -p ./src
+pyinstaller.exe --distpath ./dist --workpath ./build --specpath ./build --clean --onefile --name "fball" --windowed ./src/main.py -p ./src
 ```
 
 

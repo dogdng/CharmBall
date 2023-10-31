@@ -32,9 +32,10 @@ class FloatBall(QWidget):
         # 无边框，窗口置顶
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint
                             | Qt.WindowType.WindowStaysOnTopHint
-                            | Qt.WindowType.Window
-                            | Qt.WindowType.Popup
-                            | Qt.WindowType.Tool # 隐藏任务栏图标
+                            # | Qt.WindowType.Window
+                            # | Qt.WindowType.Popup
+                            # | Qt.WindowType.Tool # 工具窗口。工具窗口通常是一个小窗口，其标题栏和装饰比通常小，通常用于工具按钮的集合。 如果有父部件，则工具窗口将始终保持在其上。
+                            | Qt.WindowType.ToolTip # 表示窗口小部件是工具提示。 这在内部用于实现工具提示，没有标题栏和窗口边框。
                             )
         # 窗口背景透明
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
@@ -232,13 +233,13 @@ class FloatBall(QWidget):
         pos = self.frameGeometry().topLeft()
         if self.__alongside:
             if pos.x() + self.__ball_diameter >= self.screen_width:
-                # 右
+                # 屏幕右
                 self.alongside_appear(self.screen_width - self.__ball_diameter, pos.y(), "right")
             elif pos.x() <= 0:
-                # 左
+                # 屏幕左
                 self.alongside_appear(0, pos.y(), "left")
             elif pos.y() <= 0:
-                # 上
+                # 屏幕上方
                 self.alongside_appear(pos.x(), 0, "up")
             event.accept()
 

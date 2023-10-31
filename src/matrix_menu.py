@@ -42,15 +42,6 @@ class MatrixMenu(QWidget):
         '''设置原点：窗口中心坐标'''
         self.origin = origin
 
-    def get_icon(self, img_data):
-        '''通过base64编码的图片字符串获取QIcon对象'''
-        data = QtCore.QByteArray().fromBase64(img_data)
-        image = QtGui.QImage()
-        image.loadFromData(data)
-        pix = QtGui.QPixmap.fromImage(image)
-        return QIcon(pix)
-
-
     def add_buttons(self):
         # 设置布局
         # 一个垂直布局，第一层、第三层套两个网格布局，第二层放Slider
@@ -78,7 +69,7 @@ class MatrixMenu(QWidget):
         """
 
         self.button1 = MyQPushButton(self)
-        self.button1.setIcon(self.get_icon(mission_png))
+        self.button1.setIcon(utils.get_icon_from_base64(mission_png))
         self.button1.setIconSize(QSize(50, 50))
         self.button1.setFixedSize(50, 50)
         self.button1.clicked.connect(self.mission_view)
@@ -86,7 +77,7 @@ class MatrixMenu(QWidget):
         self.button1.setStyleSheet(button_style)
 
         self.close_button = MyQPushButton(self)
-        self.close_button.setIcon(self.get_icon(closemenu_png))
+        self.close_button.setIcon(utils.get_icon_from_base64(closemenu_png))
         self.close_button.setIconSize(QSize(50, 50))
         self.close_button.setFixedSize(50, 50)
         self.close_button.clicked.connect(self.switch_to_default_window)
@@ -95,7 +86,7 @@ class MatrixMenu(QWidget):
 
         self.button3 = MyQPushButton(self)
 
-        self.button3.setIcon(self.get_icon(screen_png))
+        self.button3.setIcon(utils.get_icon_from_base64(screen_png))
         self.button3.setIconSize(QSize(50, 50))
         self.button3.setFixedSize(50, 50)
         self.button3.clicked.connect(self.change_screen)
@@ -104,7 +95,7 @@ class MatrixMenu(QWidget):
 
 
         self.button6 = MyQPushButton(self)
-        self.button6.setIcon(self.get_icon(desktop_png))
+        self.button6.setIcon(utils.get_icon_from_base64(desktop_png))
         self.button6.setIconSize(QSize(50, 50))
         self.button6.setFixedSize(50, 50)
         self.button6.clicked.connect(self.back_desktop)
