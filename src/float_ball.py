@@ -188,24 +188,26 @@ class FloatBall(QWidget):
 
     def mousePressEvent(self, event):
         '鼠标按下'
+        globalPos = self.mapToGlobal(event.position()) # 替代event.globalPos()
         if event.button() == Qt.MouseButton.LeftButton:
             self.__is_window_move = True
-            self.drag_position = event.globalPos() - self.frameGeometry().topLeft()
-            self.mouse_pos = event.globalPos()
+            self.drag_position = globalPos - self.frameGeometry().topLeft()
+            self.mouse_pos = globalPos
             self.window_pos = self.pos()
         elif event.button() == Qt.MouseButton.RightButton:
             # self.right_click_ball.emit(Windows.RIGHT, self.origin)
-            self.mouse_pos = event.globalPos()
+            self.mouse_pos = globalPos
             self.window_pos = self.pos()
         return super().mousePressEvent(event)
         # event.accept() # 将事件标记为已处理
 
     def mouseMoveEvent(self, event):
         '鼠标移动'
+        globalPos = self.mapToGlobal(event.position())
         if event.buttons() == Qt.MouseButton.LeftButton and self.drag_position is not None:
             self.__is_window_move = False
-            diff = event.globalPos() - self.mouse_pos
-            new_pos = self.window_pos + diff
+            diff = globalPos - self.mouse_pos
+            new_pos = self.window_pos + diff.toPoint()
             # 限制和贴边功能冲突 new_pos = utils.limit_window_in_bounds(self.app, new_pos, self.window_size)
             self.move(new_pos)
             self.origin = QPoint(new_pos.x() + self.__ball_radius, new_pos.y() + self.__ball_radius)
@@ -300,7 +302,7 @@ class FloatBall(QWidget):
         painter.setClipPath(self.path)
         brush = QtGui.QBrush(QColor(150, 150, 150, 20))
         if self.__alongside_windows:
-            brush.setColor("#0099F7")
+            brush.setColor(QColor(0, 153, 247, 100)) # 贴边是显示的颜色
             painter.fillRect(self.rect(), brush)
         else:
             painter.fillRect(self.rect(), brush)

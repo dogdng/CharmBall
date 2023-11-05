@@ -214,7 +214,6 @@ class CPUDashBoard(QWidget):
             self.__is_window_move = False
             diff = globalPos - self.mouse_pos
             new_pos = self.window_pos + diff.toPoint()
-            # 限制和贴边功能冲突 new_pos = utils.limit_window_in_bounds(self.app, new_pos, self.window_size)
             self.move(new_pos)
             self.origin = QPoint(new_pos.x() + self.__width//2, new_pos.y() + self.__width//2)
             event.accept()
