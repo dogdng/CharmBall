@@ -17,7 +17,7 @@ from images.desktop_png import img as desktop_png
 
 class MatrixMenu(QWidget):
     '单击功能窗口'
-    switch_default = QtCore.Signal(interface.Windows, QPoint) # 信号必须放在方法外面
+    switch_default = QtCore.Signal(QPoint, interface.Windows) # 信号必须放在方法外面
     origin = QPoint()
     def __init__(self, app):
         super().__init__()
@@ -25,9 +25,8 @@ class MatrixMenu(QWidget):
         self.setWindowTitle("Matrix Menu")
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint
                             | Qt.WindowType.WindowStaysOnTopHint
-                            # | Qt.WindowType.Popup
-                            | Qt.WindowType.Window
-                            | Qt.WindowType.Tool)
+                            | Qt.WindowType.ToolTip
+                            )
 
         # self.origin
         self.window_size = QSize(202, 200)
@@ -80,7 +79,8 @@ class MatrixMenu(QWidget):
         self.close_button.setIcon(utils.get_icon_from_base64(closemenu_png))
         self.close_button.setIconSize(QSize(50, 50))
         self.close_button.setFixedSize(50, 50)
-        self.close_button.clicked.connect(self.switch_to_default_window)
+        # 点击任何按钮都会返回，没必要再放一个返回按钮
+        # self.close_button.clicked.connect(self.switch_to_default_window)
         layout.addWidget(self.close_button, 0, 1)
         self.close_button.setStyleSheet(button_style)
 
@@ -195,7 +195,7 @@ class MatrixMenu(QWidget):
     按钮槽函数
     """
     def switch_to_default_window(self):
-        self.switch_default.emit(interface.Windows.DEFAULT, self.origin)
+        self.switch_default.emit(self.origin, None)
 
     def mission_view(self):
         pass

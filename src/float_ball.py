@@ -10,8 +10,8 @@ from interface import Windows
 
 class FloatBall(QWidget):
     '''悬浮球窗口'''
-    left_click_ball = QtCore.Signal(Windows, QPoint) # 信号必须放在方法外面
-    right_click_ball = QtCore.Signal(Windows, QPoint) # 信号必须放在方法外面
+    left_click_ball = QtCore.Signal(QPoint, Windows) # 信号必须放在方法外面
+    right_click_ball = QtCore.Signal(QPoint, Windows) # 信号必须放在方法外面
     alongside_trigger = QtCore.Signal()
     __ball_radius : int
     __memory_percent = 0.0
@@ -124,8 +124,6 @@ class FloatBall(QWidget):
         # 设置字体和颜色
         font = QFont("Source Code Pro", round(self.__ball_radius/5.5), QFont.Weight.Normal)
         palette = QPalette()
-        palette.setColor(QPalette.ColorRole.WindowText, Qt.GlobalColor.red)
-        palette = QPalette()
         self.label.setFont(font)
         palette.setColor(QPalette.ColorRole.WindowText, "#B8B6B0")
         self.label.setPalette(palette)
@@ -156,7 +154,6 @@ class FloatBall(QWidget):
             self.sent_history = sent_now
             self.recv_history = recv_now
             self.__net_speed = "↑:{0}\n↓:{1}".format(self.net_speed_format(sent), self.net_speed_format(recv))
-            self.net_speed_format(recv_now)
             self.update()
 
     def net_speed_format(self, speed: float) -> str:
@@ -221,7 +218,7 @@ class FloatBall(QWidget):
             if self.__is_window_move: # 防止move之后还会触发
                 # geometry().center()方法获取到的宽度和高度的值每次都会减1，未定位到具体原因
                 # self.left_click_ball.emit(Windows.LEFT, self.geometry().center())
-                self.left_click_ball.emit(Windows.LEFT, self.origin)
+                self.left_click_ball.emit(self.origin, Windows.LEFT)
             else:
                 self.drag_position = None
         elif event.button() == Qt.MouseButton.RightButton:

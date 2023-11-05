@@ -3,7 +3,8 @@ from enum import Enum, unique, auto
 @unique
 class Windows(Enum):
     '''窗口枚举'''
-    DEFAULT = auto()
+    STSTEM_INFO = auto()
+    CPU_INFO = auto()
     LEFT = auto()
     RIGHT = auto()
     # TRAY = auto() 系统托盘图标不属于窗口
