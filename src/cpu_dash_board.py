@@ -303,7 +303,7 @@ class CPUDashBoard(QWidget):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)  # 抗锯齿
         # 背景
-        brush = QtGui.QBrush(QColor(0, 0, 0, 1))
+        brush = QtGui.QBrush(QColor(0, 0, 0, 1)) # 不能全透明。全透明时，贴边唤醒会一直跳。
         if self.__alongside_windows:
             brush.setColor(QColor(0, 153, 247, 75))
             painter.fillRect(self.rect(), brush)
