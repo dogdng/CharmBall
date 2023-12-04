@@ -22,7 +22,7 @@ python -m pdb main.py
 ## 打包
 直接打包成一个exe文件
 ```
-pyinstaller.exe --distpath ./dist --workpath ./build --specpath ./build --clean --onefile --name "fball" --windowed --icon "F:\desktop\CharmButton\resources\CB.ico" ./src/main.py -p ./src
+pyinstaller.exe --distpath ./dist --workpath ./build --specpath ./build --clean --onefile --name "fball" --windowed --icon ../resources/CB.ico ./src/main.py -p ./src
 ```
 打包时没有直接使用图片文件，因为在打包之后运行总是找不到图片，绝对路径和相对路径都不行。解决方法是利用convert_base64.py将图片转为base64的字符串存在python源文件中，使用时再转回来。
 
